@@ -1,0 +1,13 @@
+# Ignore virtual environment and temp files
+*.tar.gz
+*.pyc
+__pycache__/
+*.log
+
+# Ignore Spark temp dirs
+spark-temp/
+
+# Ignore HDFS data or Parquet
+data/
+*.parquet
+output/

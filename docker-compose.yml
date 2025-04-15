@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  cluster-master:
+    image: firasj/spark-docker-cluster
+    container_name: cluster-master
+    ports:
+      - "8088:8088"   # YARN ResourceManager
+      - "4040:4040"   # Spark UI
+      - "19888:19888" # MapReduce Job History
+      - "9000:9000"   # HDFS Namenode
+      - "9870:9870"   # HDFS Web UI
+    volumes:
+      - "./app:/app"
+      - "./spark-temp:/app/spark-temp"
+    networks:
+      - spark-cluster
+    depends_on:
+      - cluster-slave-1
+      - cassandra-server
+    hostname: cluster-master
+    tty: true
+    working_dir: /app
+    entrypoint:
+      - bash
+      - /app/app.sh
+    environment:
+      - SPARK_LOCAL_DIRS=/app/spark-temp
+    dns:
+      - 8.8.8.8
+
+  cluster-slave-1:
+    image: firasj/spark-docker-cluster
+    container_name: cluster-slave-1
+    networks:
+      - spark-cluster
+    hostname: cluster-slave-1
+    tty: true
+
+  cassandra-server:
+    image: cassandra
+    container_name: cassandra-server
+    ports:
+      - "7000:7000"
+    networks:
+      - spark-cluster
+
+networks:
+  spark-cluster:
+    driver: bridge
+
