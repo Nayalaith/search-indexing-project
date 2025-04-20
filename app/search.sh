@@ -1,18 +1,25 @@
 #!/bin/bash
-echo "This script will include commands to search for documents given the query using Spark RDD"
 
+if [ -z "$1" ]; then
+  echo "Usage: bash search.sh \"your query here\""
+  exit 1
+fi
 
-source .venv/bin/activate
+QUERY="$1"
+echo "Running search for query: $QUERY"
 
-# Python of the driver (/app/.venv/bin/python)
-export PYSPARK_DRIVER_PYTHON=$(which python) 
+# Ensure query.py is executable and has a proper shebang
+chmod +x /app/query.py
 
-# Python of the excutor (./.venv/bin/python)
-export PYSPARK_PYTHON=./.venv/bin/python
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --conf spark.driver.memory=2g \
+  --conf spark.executor.memory=2g \
+  --conf spark.executor.memoryOverhead=512m \
+  --conf spark.executor.cores=1 \
+  --archives .venv.tar.gz#.venv \
+  --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=./.venv/bin/python \
+  --conf spark.executorEnv.PYSPARK_PYTHON=./.venv/bin/python \
+  /app/query.py "$QUERY"
 
-spark-submit --master yarn --archives /app/.venv.tar.gz#.venv query.py  $1
-
-## app/search.sh
-#!/bin/bash
-QUERY=$1
-echo "$QUERY" | spark-submit --master yarn /app/query.py

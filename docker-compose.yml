@@ -13,6 +13,8 @@ services:
     volumes:
       - "./app:/app"
       - "./spark-temp:/app/spark-temp"
+      - "./hadoop-tmp:/app/hadoop/tmp"
+
     networks:
       - spark-cluster
     depends_on:

@@ -1,17 +1,20 @@
-### app/mapreduce/mapper1.py
 #!/usr/bin/env python3
 import sys
 import re
 
 def tokenize(text):
-    return re.findall(r"\b\w+\b", text.lower())
+    return re.findall(r"\w+", text.lower())
 
 for line in sys.stdin:
-    try:
-        doc_id, title, content = line.strip().split("\t", 2)
-        words = tokenize(content)
-        for word in words:
-            print(f"{word}\t{doc_id}")
-    except Exception:
+    line = line.strip()
+    if not line:
         continue
+    try:
+        doc_id, doc_title, doc_text = line.split("\t", 2)
+        tokens = tokenize(doc_text)
+        for token in tokens:
+            sys.stdout.write(f"{token}\t{doc_id}:1\n")
+    except ValueError:
+        # Log malformed lines to stderr
+        sys.stderr.write(f"Skipping malformed line: {line}\n")
 
