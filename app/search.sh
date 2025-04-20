@@ -8,7 +8,6 @@ fi
 QUERY="$1"
 echo "Running search for query: $QUERY"
 
-# Ensure query.py is executable and has a proper shebang
 chmod +x /app/query.py
 
 spark-submit \
